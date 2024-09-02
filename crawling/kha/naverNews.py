@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor
 
 import datetime as dt
 import calendar
@@ -104,7 +105,10 @@ def crawling_all(sector, max_data, day_range):
                 day_list.append(now_date)
             except ValueError:
                 break
-        
+
+# with ThreadPoolExecutor(max_workers=2) as executor:
+#     cntr_sr = list(tqdm(executor.map(process_dynamic_chunk, df['content_re'], chunksize=50), total=len(df)))
+
         # $$$ 병렬 처리
         for day in day_list:
             df_day = crawling_day(sector, day)
@@ -126,3 +130,5 @@ if __name__=='__main__':
     test_params = {'sector': 'IT', 'max_data': 2e4, 'day_range': 2}
 
     crawling_all(**test_params)
+
+
