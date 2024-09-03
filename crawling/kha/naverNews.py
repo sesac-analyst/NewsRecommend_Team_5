@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
+
 from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
 
 import datetime as dt
 import calendar
@@ -16,6 +18,8 @@ eco_dict = {'증권': 258, '금융': 259, '부동산': 260, '산업/재계': 261
                 '글로벌 경제': 262, '경제 일반': 263, '생활경제': 310, '중기/벤처': 771}
 it_dict = {'모바일': 731, '인터넷/SNS': 226, '통신/뉴미디어': 227, 'IT 일반': 230, '보안/해킹': 732, '컴퓨터': 283, '게임/리뷰': 229, '과학 일반': 228}
 child_sec_dict = {101: eco_dict, 105: it_dict}
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'}
 
 
 def save_dataframe(df: pd.DataFrame, file_path: str):
@@ -33,20 +37,21 @@ def get_info(soup:BeautifulSoup):
         articles = box.select('div.sa_text')
         # print(len(articles))
         for article in articles:
-            # 제목, url, 언론사 # 댓글수
+            # 제목, article_url, cmt_url, 언론사 # 댓글수
             title = article.select_one('strong.sa_text_strong').text
-            news_url = article.select_one('a')['href']
-            press = article.select_one('div.sa_text_press').text
-            # print(title[:10], press, news_url)
-            info_list.append([title, press, news_url])
+            article_url = article.select_one('a')['href']
+            cmt_url = article.select_one('a.sa_text_cmt')['href']
+            publisher = article.select_one('div.sa_text_press').text
+            # print(title[:10], publisher, article_url)
+            info_list.append([title, publisher, article_url, cmt_url])
     return info_list
 
 def scrap_pages(sid1, sid2, date_str):
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'}
     info_list = []
 
     # 첫 화면
     init_url = f"https://news.naver.com/breakingnews/section/{sid1}/{sid2}?date={date_str}"
+    # print(init_url)
     res = requests.get(init_url, headers= headers)
     soup = BeautifulSoup(res.text, 'html.parser') 
     info_list.extend(get_info(soup))
@@ -68,7 +73,7 @@ def scrap_pages(sid1, sid2, date_str):
         info_list.extend(get_info(soup))
     return info_list
 
-def crawling_day(sector: str, day: dt.datetime) -> pd.DataFrame:
+def crawling_day(sector: str, day: dt.datetime) -> int:
     print(f"{day.strftime(r'%Y-%m-%d')} Day start!")
 
     sid1 = sec_dict[sector]
@@ -77,15 +82,20 @@ def crawling_day(sector: str, day: dt.datetime) -> pd.DataFrame:
     date_str = day.strftime(r'%Y%m%d')
     for sec2, sid2 in child_sec_dict[sid1].items():
         info_list = scrap_pages(sid1, sid2, date_str)
-        df_day_sec2 = pd.DataFrame(info_list, columns=['title', 'press', 'url'])
-        df_day_sec2['date'] = day.strftime(r'%Y-%m-%d')
-        df_day_sec2['sec2'] = sec2
+        df_day_sec2 = pd.DataFrame(info_list, columns=['title', 'publisher', 'article_url', 'cmt_url'])
+        df_day_sec2['category2'] = sec2
 
         df_day = pd.concat([df_day, df_day_sec2], ignore_index=True)
-        print(f"Sector: {sec2}, {len(df_day_sec2)}개")
+        print(f"category2: {sec2}, {len(df_day_sec2)}개")
+
+    df_day['publication_date'] = day.strftime(r'%Y-%m-%d')
+    df_day['category1'] = sector
+
+    f_path = os.path.join('D:\python_project\sesac02\data', f'news_naver_{sector}.csv')
+    save_dataframe(df_day, f_path)
 
     print(f"{day} Day finished! + {len(df_day)}개")
-    return df_day
+    return len(df_day)
 
 # 병렬 처리 <- 일별로
 def crawling_all(sector, max_data, day_range):
@@ -106,16 +116,12 @@ def crawling_all(sector, max_data, day_range):
             except ValueError:
                 break
 
-# with ThreadPoolExecutor(max_workers=2) as executor:
-#     cntr_sr = list(tqdm(executor.map(process_dynamic_chunk, df['content_re'], chunksize=50), total=len(df)))
-
         # $$$ 병렬 처리
         for day in day_list:
             df_day = crawling_day(sector, day)
             cnt += len(df_day)
             # file save
-            f_path = os.path.join('D:\python_project\sesac02\data', f'news_naver_{sector}.csv')
-            save_dataframe(df_day, f_path)
+
             print(f"Total: {cnt}개")
 
         print(f"{std_date.strftime(r'%Y-%m')} Month finished! -> now: {cnt}개")
@@ -123,12 +129,25 @@ def crawling_all(sector, max_data, day_range):
 
     return
 
+def crawling_term_date(sector, start_date="2023-08-01", end_date="2024-07-31"):
+
+    day_list = list(map(lambda x: x.to_pydatetime(), pd.date_range(start=start_date, end=end_date)))
+    sector_list = [sector]*len(day_list)
+
+    with ThreadPoolExecutor() as executor:
+        results = list(tqdm(executor.map(crawling_day, sector_list, day_list), total=len(day_list)))
+
+    return
+
 
 if __name__=='__main__':
     # sec2_dict = {'증권': 258, '금융': 259, '부동산': 260, '산업/재계': 261,
     #              '글로벌 경제': 262, '경제 일반': 263, '생활경제': 310, '중기/벤처': 771}
-    test_params = {'sector': 'IT', 'max_data': 2e4, 'day_range': 2}
 
-    crawling_all(**test_params)
+    # test_params = {'sector': 'IT', 'max_data': 2e5, 'day_range': 35}
+    # crawling_all(**test_params)
 
+    # test_params = {'sector': 'IT', 'start_date': "2023-08-01", 'end_date': "2023-08-02"}
+    # crawling_term_date(**test_params)
 
+    crawling_term_date(sector='IT')
