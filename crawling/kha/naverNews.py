@@ -120,7 +120,6 @@ def crawling_all(sector, max_data, day_range):
         for day in day_list:
             df_day = crawling_day(sector, day)
             cnt += len(df_day)
-            # file save
 
             print(f"Total: {cnt}개")
 
