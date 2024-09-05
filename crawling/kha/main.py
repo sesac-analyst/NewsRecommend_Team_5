@@ -27,7 +27,7 @@ contents_error_list = []
 
 
 def tpe_func_cmmts(article_url):
-    print(f"Scrape comments in {article_url}")
+    # print(f"Scrape comments in {article_url}")
     try:
         get_naver_comments(article_url, comments_file_name, comments_columns)
     except Exception as ex:
@@ -35,7 +35,7 @@ def tpe_func_cmmts(article_url):
     return
 
 def tpe_func_contents(article_url):
-    print(f"Scrape contents in {article_url}")
+    # print(f"Scrape contents in {article_url}")
     try:
         get_specific_info(article_url, contents_file_name, contents_columns)
     except Exception as ex:
@@ -43,14 +43,19 @@ def tpe_func_contents(article_url):
     return
 
 
-f_path = os.path.join('D:\python_project\sesac02\data', 'news_naver_IT_sample.csv')
+# Get article urls
+basic_data = 'news_naver_IT_cleaned.csv'
+# basic_data = 'news_naver_IT_sample.csv'
+
+f_path = os.path.join('D:\python_project\sesac02\data', basic_data)
 df = pd.read_csv(f_path)
 
+test_num = len(df)
+# test_num = 3
+
+# Empty file create
 save_empty_csv(comments_file_name, comments_columns)
 save_empty_csv(contents_file_name, contents_columns)
-
-test_num = len(df)
-test_num = 3
 
 # 댓글 가져오기
 with ThreadPoolExecutor() as executor:
