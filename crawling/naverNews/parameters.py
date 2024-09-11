@@ -1,3 +1,11 @@
+sec_dict = {'경제': 101, 'IT': 105}
+eco_dict = {'증권': 258, '금융': 259, '부동산': 260, '산업/재계': 261,
+                '글로벌 경제': 262, '경제 일반': 263, '생활경제': 310, '중기/벤처': 771}
+it_dict = {'모바일': 731, '인터넷/SNS': 226, '통신/뉴미디어': 227, 'IT 일반': 230, '보안/해킹': 732, '컴퓨터': 283, '게임/리뷰': 229, '과학 일반': 228}
+child_sec_dict = {101: eco_dict, 105: it_dict}
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'}
+
 params_init = {'ticket': 'news',
  'templateId': 'default_it',
  'pool': 'cbox5',
