@@ -4,13 +4,6 @@ import os
 
 from news import News
 
-# 관련기사1과 관련기사2를 생성하는 함수 (예시 데이터)
-def generate_related_articles(news_text):
-    # 입력된 뉴스 기사를 기반으로 관련 기사를 생성하는 로직을 여기에 구현할 수 있음.
-    # 현재는 예시 데이터를 반환함.
-    related_articles1 = [f"관련기사1 - {i+1}: {news_text[:10]} ..." for i in range(5)]
-    related_articles2 = [f"관련기사2 - {i+1}: {news_text[:10]} ..." for i in range(5)]
-    return related_articles1, related_articles2
 
 # 뉴스 기사 입력 후 버튼 클릭 시 관련 기사를 출력하는 함수
 def on_generate_articles():
