@@ -1,4 +1,5 @@
 import pandas as pd
+import ast
 import os
 
 class News:
@@ -15,4 +16,5 @@ class News:
         else:
             in_urls = now_row['daum_urls']
             cross_urls = now_row['naver_urls']
-        return {'in_urls': in_urls, 'cross_urls': cross_urls}
+
+        return {'in_urls': ast.literal_eval(in_urls), 'cross_urls': ast.literal_eval(cross_urls)}
