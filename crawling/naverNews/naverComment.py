@@ -12,7 +12,7 @@ import json
 from math import ceil
 import copy
 
-from crawling.kha.parameters import params_init, params_more
+from crawling.naverNews.parameters import params_init, params_more
 from utils.saveFile import save_mat2DF
 import sys
 
@@ -82,28 +82,3 @@ def get_naver_comments(article_url, f_name, columns):
     save_mat2DF(cmt_list_total, columns, f_name)
     return 
 
-if __name__=='__main__':
-    # cmt_url = 'https://n.news.naver.com/mnews/article/comment/092/0002300844'
-    # cmt_url = 'https://n.news.naver.com/mnews/article/comment/003/0012757566'
-    article_url = 'https://n.news.naver.com/mnews/article/003/0012757566'
-    file_name = 'naver_IT_comments.csv'
-
-    # cmt_list = get_naver_comments(article_url, file_name)
-    # for i, cmt in enumerate(cmt_list):
-    #     print(i, cmt)
-
-
-
-# def parse_string_to_dict(input_string):
-#     # 줄 단위로 분리하여 리스트로 변환
-#     lines = input_string.strip().split('\n')
-    
-#     # 딕셔너리 생성
-#     result_dict = {}
-    
-#     # 각 줄을 순회하며 key-value 쌍으로 분리
-#     for line in lines:
-#         key, value = line.split(':', 1)  # ':'를 기준으로 split, 최대 1회 split
-#         result_dict[key.strip()] = value.strip()  # key, value 공백 제거 후 딕셔너리에 추가
-    
-#     return result_dict

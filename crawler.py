@@ -2,19 +2,13 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
 import pandas as pd
-import json
+# import json
 import os
-
-# import time
-# import calendar
-# import datetime as dt
-# from dateutil import rrule
 
 import pickle
 
-
-from crawling.kha.naverComment import get_naver_comments
-from crawling.kha.naverContent import get_specific_info, save_empty_csv
+from crawling.naverNews.naverComment import get_naver_comments
+from crawling.naverNews.naverContent import get_specific_info, save_empty_csv
 
 
 comments_file_name = 'news_naver_IT_comments.csv'
