@@ -11,10 +11,10 @@ class News:
     def recommend_articles(self, article_url):
         now_row = self.df.loc[article_url]
         if 'naver' in article_url:
-            in_urls = now_row['naver_urls']
-            cross_urls = now_row['daum_urls']
+            in_urls = now_row['n_sim']
+            cross_urls = now_row['d_sim']
         else:
-            in_urls = now_row['daum_urls']
-            cross_urls = now_row['naver_urls']
+            in_urls = now_row['d_sim']
+            cross_urls = now_row['n_sim']
 
-        return {'in_urls': ast.literal_eval(in_urls), 'cross_urls': ast.literal_eval(cross_urls)}
+        return {'in_urls': list(ast.literal_eval(in_urls).keys()), 'cross_urls': list(ast.literal_eval(cross_urls).keys())}
