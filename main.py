@@ -30,7 +30,7 @@ def on_generate_articles():
         cross_related.insert(tk.END, "뉴스 기사를 입력하세요.")
 
 # News 불러오기
-data_path = os.path.join("D:\python_project\sesac02\data", 'sim_test.csv')
+data_path = os.path.join("D:\python_project\sesac02\data", 'similarity_data_3m.csv')
 news = News(data_path)
 print(news.df.head(5))
 
